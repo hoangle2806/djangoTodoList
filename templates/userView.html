@@ -1,0 +1,29 @@
+{% extends 'index.html' %}
+
+{% block content %}
+
+<h1>For {{username}} View</h1>
+<form method="POST">
+        {% csrf_token %}
+    <label>New Note: </label>
+    <input placeholder='Enter new note'type="text" name="note_input">
+    <input type="submit" value="Submit">
+</form>
+<br/>
+<br/>
+<h1>Notes Lists</h1>
+<div class='text-center'>
+    {% for i in data%}
+    <div>
+        {{i.text}}
+        <a href="http://127.0.0.1:8000/delete/{{username}}/{{i.id}}/{{token}}">DELETE</a>
+        <form method="POST" action="/update/{{username}}/{{i.id}}/{{token}}/">
+            {% csrf_token %}
+            <input placeholder='Enter another note' type="text" name="editedText"   >
+            <input type="submit" value="Edit"/>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+</div>
+{% endblock %}

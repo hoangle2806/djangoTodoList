@@ -1,0 +1,20 @@
+
+
+html,body {
+  height: 100%
+}
+
+body{
+    background-image: url("hireme.jpg") ;
+    background-repeat: no-repeat;
+    background-position: right top;
+    background-size: 35%;
+    background-color: #D3D3D3;
+}
+
+.center {
+    margin: auto;
+    width: 30%;
+    border: 3px solid #73AD21;
+    padding: 10px;
+}
