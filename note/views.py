@@ -5,7 +5,9 @@ from django.shortcuts import render
 
 # Create your views here.
 import requests
+# from grequests import AsyncRequest
 import json
+
 from django.shortcuts import render,redirect
 
 def home(request):
@@ -16,16 +18,12 @@ def logInView(request):
     if request.method == 'POST':
         username = request.POST.get("username")
         password = request.POST.get("password")
-        #make asynchronous call to rest_framework API backend
+        #timeout parameter is used for async call.
         URL = 'http://127.0.0.1:8000/api/auth/login/'
-        # response = await requests.post(URL,{
-        #     'username':username,
-        #     'password': password
-        # })
         response = requests.post(URL,{
             'username':username,
             'password': password
-        })
+        },timeout = 1)
         if response.status_code == 200:
             response = response.json()
         return redirect('http://127.0.0.1:8000/user/{}/{}'.format(response['user']['username'],response['token']))
@@ -44,7 +42,7 @@ def RegisterView(request):
         URL = 'http://127.0.0.1:8000/api/auth/register/'
         response = requests.post(URL, headers={
             'Content-Type':'application/json',
-        }, data= data)
+        }, data= data, timeout = 1)
         if response.status_code == 200:
             return redirect("/login/")
         else:
@@ -65,14 +63,17 @@ def UserView(request,username,token):
         response = requests.post(URL,headers={
         'Content-Type':'application/json',
         "Authorization" : 'Token {}'.format(token)
-        }, data= data)
+        }, data= data, timeout = 5)
+        if response.status_code < 200 or response.status_code > 300:
+            return render(request,"somethingWrong.html",{})
 
-    #load data from database, asynchronous call
     URL = 'http://127.0.0.1:8000/api/notes/'
     response = requests.get(URL,headers={
         'Content-Type':'application/json',
         "Authorization" : 'Token {}'.format(token)
-    })
+    },timeout = 1)
+    if response.status_code < 200 or response.status_code > 300:
+            return render(request,"somethingWrong.html",{})
     return render(request, "userView.html", {
         'data' : response.json(),
         'token' : token,
@@ -84,7 +85,9 @@ def DeleteView(request,username,note_id,token):
     response = requests.delete(URL,headers = {
         'Content-Type':'application/json',
         "Authorization" : 'Token {}'.format(token)
-    })
+    },timeout = 1)
+    if response.status_code < 200 or response.status_code > 300:
+            return render(request,"somethingWrong.html",{})
     return redirect("/user/{}/{}".format(username,token))
 
 def DeleteView(request,username,note_id,token):
@@ -92,7 +95,9 @@ def DeleteView(request,username,note_id,token):
     response = requests.delete(URL,headers = {
         'Content-Type':'application/json',
         "Authorization" : 'Token {}'.format(token)
-    })
+    },timeout = 1)
+    if response.status_code < 200 or response.status_code > 300:
+            return render(request,"somethingWrong.html",{})
     return redirect("/user/{}/{}".format(username,token))
 
 def EditView(request,username,note_id,token):
@@ -104,6 +109,8 @@ def EditView(request,username,note_id,token):
     response = requests.put(URL,headers = {
         'Content-Type':'application/json',
         "Authorization" : 'Token {}'.format(token)
-    }, data = data)
+    }, data = data,timeout = 1)
+    if response.status_code < 200 or response.status_code > 300:
+            return render(request,"somethingWrong.html",{})
     return redirect("/user/{}/{}".format(username,token))
 
