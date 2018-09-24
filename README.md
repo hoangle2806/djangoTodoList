@@ -4,6 +4,7 @@
 To Run this app
 
 $git clone https://github.com/hoangle2806/djangoAPP.git
+
 $cd djangoAPP
 $pip install -r requirements.txt
 $./manage.py makemigrations
